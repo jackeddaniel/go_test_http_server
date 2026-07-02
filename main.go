@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -27,8 +28,20 @@ func loadPage(title string) (*Page, error) {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
-	log.Println(r.URL)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	responseData := map[string]string{
+		"rip":     "sies",
+		"message": "mensaje",
+	}
+	err := json.NewEncoder(w).Encode(responseData)
+
+	if err != nil {
+		log.Printf("Failed to encode JSON: %v", err)
+		http.Error(w, "Internam Server Error", http.StatusInternalServerError)
+		return
+	}
 }
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
